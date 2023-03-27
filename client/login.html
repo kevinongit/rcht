@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
+  <link rel="stylesheet" href="style.css">
+  <title>RedChatty</title>
+
+</head>
+
+<body>
+  <h2>Welcome to RedChatty</h2>
+
+  <form id="loginForm" action="" method="post">
+    <div class="imgcontainer">
+      <!-- <img src="img/img_avatar2.png" alt="Avatar" class="avatar"> -->
+      <img src="img/login2.jpg" alt="Avatar" class="avatar">
+    </div>
+
+    <div class="container">
+      <label for="id"><b>ID</b></label>
+      <input id="id" type="text" placeholder="Enter ID" name="id" required>
+
+      <label for="psw"><b>Password</b></label>
+      <input id="password" type="password" placeholder="Enter Password" name="psw" required>
+
+      <button type="submit">Login</button>
+      <label>
+        <input id="remember" type="checkbox" checked="checked" name="remember"> Remember me
+      </label>
+    </div>
+    
+
+    <div class="container" style="background-color:#f1f1f1">
+      <p id="message">login plz..</p>
+      <!-- <button type="button" class="cancelbtn">Cancel</button>
+      <span class="psw">Forgot <a href="#">password?</a></span> -->
+    </div>
+  </form>
+  <script>
+    let form = document.getElementById('loginForm')
+    let idVar = document.getElementById('id')
+    let passwordVar = document.getElementById('password')
+    const message = document.getElementById('message')
+    form.addEventListener('submit', function (e) {
+      e.preventDefault()
+      const data = {
+        id: idVar.value,
+        password: passwordVar.value,
+      }
+      message.innerHTML = ''
+      fetch('http://127.0.0.1/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+      .then(res => {
+        if (!res.ok) {
+          message.innerHTML = `login failed : ${res.statusText} (${res.status}).`
+          throw new Error(`HTTP error (${res.status})`)
+        }
+        
+        return res.json()
+      })
+      .then(body => {
+        const token = body.token
+
+        /// save token
+        localStorage.setItem('token', token)
+
+        console.log({token})
+        window.location.href = `./home.html?token=${token}&uid=${idVar.value}`
+      })
+      .catch(e => {
+        console.log(`Error : ${e}`)
+        idVar.value = ''
+        passwordVar.value = ''
+      })
+
+      // if (id && password) {
+      //   socket.emit('authenticate', {id, password})
+      //   input.value = ''
+      // }
+    })
+  </script>
+</body>
+
+</html>
